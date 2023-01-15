@@ -12,8 +12,16 @@ app.use(bodyParser.urlencoded({ extended: true }));
 mongoose.set("strictQuery", true);
 mongoose.connect("mongodb://localhost:27017/mestodb");
 
-app.use("/users", require("./routes/users"));
+app.use((req, res, next) => {
+	req.user = {
+		_id: "63c44a9db68d2c010b169e4f",
+	};
 
+	next();
+});
+
+app.use("/users", require("./routes/users"));
+app.use("/cards", require("./routes/cards"));
 app.use(express.static(path.join(__dirname, "public")));
 
 app.listen(PORT, () => {
