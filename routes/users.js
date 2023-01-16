@@ -1,14 +1,14 @@
 const router = require("express").Router();
 const {
 	createUser,
-	getUser,
+	getUsers,
 	getUserById,
 	patchUserProfile,
 	patchUserAvatar,
 } = require("../controllers/users");
 const User = require("../models/user");
 
-router.get("/", getUser);
+router.get("/", getUsers);
 
 router.get("/:_id", getUserById);
 

@@ -1,21 +1,25 @@
 const User = require("../models/user");
+const { userResFormat } = require("../utils/utils");
 
-const getUser = (req, res) => {
+const getUsers = (req, res) => {
 	User.find({})
-		.then((users) => res.send({ data: users }))
+		.then((users) => users.map((user) => userResFormat(user)))
+		.then((users) => res.send(users))
 		.catch(() => res.status(500).send({ message: "Произошла ошибка" }));
 };
 
 const getUserById = (req, res) => {
 	User.findById(req.params._id)
-		.then((user) => res.send({ data: user }))
+		.then((user) => res.send(userResFormat(user)))
 		.catch(() => res.status(500).send({ message: "Произошла ошибка" }));
 };
 
 const createUser = (req, res) => {
 	const { name, about, avatar } = req.body;
 	User.create({ name, about, avatar })
-		.then((user) => res.send({ data: user }))
+		.then((user) =>
+			res.send(userResFormat(user))
+		)
 		.catch(() => res.status(500).send({ message: "Произошла ошибка" }));
 };
 
@@ -34,7 +38,7 @@ const patchUserProfile = (req, res) => {
 			runValidators: true,
 		}
 	)
-		.then((user) => res.send({ data: user }))
+		.then((user) => res.send(userResFormat(user)))
 		.catch(() => res.status(500).send({ message: "Произошла ошибка" }));
 };
 
@@ -52,13 +56,13 @@ const patchUserAvatar = (req, res) => {
 			runValidators: true,
 		}
 	)
-		.then((user) => res.send({ data: user }))
+		.then((user) => res.send(userResFormat(user)))
 		.catch(() => res.status(500).send({ message: "Произошла ошибка" }));
 };
 
 module.exports = {
 	createUser: createUser,
-	getUser: getUser,
+	getUsers: getUsers,
 	getUserById: getUserById,
 	patchUserProfile: patchUserProfile,
 	patchUserAvatar: patchUserAvatar,
