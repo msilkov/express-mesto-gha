@@ -31,17 +31,17 @@ const createUser = (req, res) => {
 	const { name, about, avatar } = req.body;
 	User.create({ name, about, avatar })
 		.then((user) => {
+			res.status(200).send(userResFormat(user));
+		})
+		.catch(() => {
 			let err = new Error("NotValidUserData");
-
-			if (err.message === "NotValidUserData") {
+			err.name = "createUser";
+			if (err.name === "createUser") {
 				res.status(400).send({ message: "Переданы некорректные данные" });
 				return;
 			}
-			res.status(200).send(userResFormat(user));
-		})
-		.catch(() =>
-			res.status(500).send({ message: "Произошла непредвиденная ошибка" })
-		);
+			res.status(500).send({ message: "Произошла непредвиденная ошибка" });
+		});
 };
 
 const patchUserProfile = (req, res) => {
@@ -60,17 +60,24 @@ const patchUserProfile = (req, res) => {
 		}
 	)
 		.then((user) => {
-			let err = new Error("NotValidUserData");
+			if (!user) {
+				res
+					.status(404)
+					.send({ message: "Запрашиваемый пользователь не найден" });
+				return;
+			}
 
-			if (err.message === "NotValidUserData") {
+			res.status(200).send(userResFormat(user));
+		})
+		.catch(() => {
+			let err = new Error("NotValidUserData");
+			err.name = "patchUserProfile";
+			if (err.name === "patchUserProfile") {
 				res.status(400).send({ message: "Переданы некорректные данные" });
 				return;
 			}
-			res.status(200).send(userResFormat(user));
-		})
-		.catch(() =>
-			res.status(500).send({ message: "Произошла непредвиденная ошибка" })
-		);
+			res.status(500).send({ message: "Произошла непредвиденная ошибка" });
+		});
 };
 
 const patchUserAvatar = (req, res) => {
@@ -88,17 +95,24 @@ const patchUserAvatar = (req, res) => {
 		}
 	)
 		.then((user) => {
-			let err = new Error("NotValidUserData");
+			if (!user) {
+				res
+					.status(404)
+					.send({ message: "Запрашиваемый пользователь не найден" });
+				return;
+			}
 
-			if (err.message === "NotValidUserData") {
+			res.status(200).send(userResFormat(user));
+		})
+		.catch(() => {
+			let err = new Error("NotValidUserAvatar");
+			err.name = "patchUserAvatar";
+			if (err.name === "patchUserAvatar") {
 				res.status(400).send({ message: "Переданы некорректные данные" });
 				return;
 			}
-			res.status(200).send(userResFormat(user));
-		})
-		.catch(() =>
-			res.status(500).send({ message: "Произошла непредвиденная ошибка" })
-		);
+			res.status(500).send({ message: "Произошла непредвиденная ошибка" });
+		});
 };
 
 module.exports = {
