@@ -23,6 +23,12 @@ const getUserById = (req, res) => {
 			res.status(200).send(userResFormat(user));
 		})
 		.catch(() => {
+			let err = new Error("NotValidUserId");
+			err.name = "getUserById";
+			if (err.name === "getUserById") {
+				res.status(400).send({ message: "Переданы некорректные данные" });
+				return;
+			}
 			res.status(500).send({ message: "Произошла непредвиденная ошибка" });
 		});
 };
