@@ -17,4 +17,4 @@
 
 ## Ссылка на репозитоий 
 
-https://msilkov.github.io/express-mesto-gha/
+https://github.com/msilkov/express-mesto-gha
