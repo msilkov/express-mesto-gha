@@ -23,8 +23,8 @@ app.use((req, res, next) => {
 app.use("/users", require("./routes/users"));
 app.use("/cards", require("./routes/cards"));
 app.use(express.static(path.join(__dirname, "public")));
-
-app.get("*", (req, res) => {
+app.use(express.json());
+app.use("*", (req, res) => {
 	res.status(404).send({ message: "Страница не найдена." });
 });
 
