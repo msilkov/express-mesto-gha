@@ -6,7 +6,6 @@ const {
 	patchUserProfile,
 	patchUserAvatar,
 } = require("../controllers/users");
-const User = require("../models/user");
 
 router.get("/", getUsers);
 

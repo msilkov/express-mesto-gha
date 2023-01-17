@@ -6,7 +6,6 @@ const {
 	setCardLike,
 	removeCardLike,
 } = require("../controllers/cards");
-const Card = require("../models/card");
 
 router.get("/", getCard);
 

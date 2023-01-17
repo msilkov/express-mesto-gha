@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
 const path = require("path");
 
-const { PORT = 3000, BASE_PATH } = process.env;
+const { PORT = 3000 } = process.env;
 const app = express();
 
 app.use(bodyParser.json());
@@ -26,5 +26,4 @@ app.use(express.static(path.join(__dirname, "public")));
 
 app.listen(PORT, () => {
 	console.log(`App listening on port ${PORT}`);
-	console.log(BASE_PATH);
 });

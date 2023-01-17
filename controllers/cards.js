@@ -5,21 +5,41 @@ const getCard = (req, res) => {
 	Card.find({})
 		.then((cards) => cards.map((card) => cardResFormat(card)))
 		.then((cards) => res.send(cards))
-		.catch(() => res.status(500).send({ message: "Произошла ошибка" }));
+		.catch(() =>
+			res.status(500).send({ message: "Произошла непредвиденная ошибка" })
+		);
 };
 
 const createCard = (req, res) => {
 	const { name, link } = req.body;
 	const owner = req.user._id;
 	Card.create({ name, link, owner })
-		.then((card) => res.send(cardResFormat(card)))
-		.catch(() => res.status(500).send({ message: "Произошла ошибка" }));
+		.then((card) => {
+			let err = new Error("NotValidCardData");
+
+			if (err.message === "NotValidCArdData") {
+				res.status(400).send({ message: "Переданы некорректные данные" });
+				return;
+			}
+			res.status(200).send(cardResFormat(card));
+		})
+		.catch(() =>
+			res.status(500).send({ message: "Произошла непредвиденная ошибка" })
+		);
 };
 
 const deleteCard = (req, res) => {
 	Card.findByIdAndRemove(req.params._id)
-		.then((card) => res.send(cardResFormat(card)))
-		.catch(() => res.status(500).send({ message: "Произошла ошибка" }));
+		.then((card) => {
+			if (!card) {
+				res.status(404).send({ message: "Карточка с данным id не найдена." });
+				return;
+			}
+			res.status(200).send(cardResFormat(card));
+		})
+		.catch(() =>
+			res.status(500).send({ message: "Произошла непредвиденная ошибка" })
+		);
 };
 
 const setCardLike = (req, res) => {
@@ -28,8 +48,16 @@ const setCardLike = (req, res) => {
 		{ $addToSet: { likes: req.user._id } },
 		{ new: true }
 	)
-		.then((card) => res.send(cardResFormat(card)))
-		.catch(() => res.status(500).send({ message: "Произошла ошибка" }));
+		.then((card) => {
+			if (!card) {
+				res.status(404).send({ message: "Карточка с данным id не найдена." });
+				return;
+			}
+			res.status(200).send(cardResFormat(card));
+		})
+		.catch(() =>
+			res.status(500).send({ message: "Произошла непредвиденная ошибка" })
+		);
 };
 
 const removeCardLike = (req, res) => {
@@ -38,9 +66,15 @@ const removeCardLike = (req, res) => {
 		{ $pull: { likes: req.user._id } },
 		{ new: true }
 	)
-		.then((card) => res.send(cardResFormat(card)))
+		.then((card) => {
+			if (!card) {
+				res.status(404).send({ message: "Карточка с данным id не найдена." });
+				return;
+			}
+			res.status(200).send(cardResFormat(card));
+		})
 		.catch(() =>
-			res.status(500).send({ message: "На сервере произошла ошибка" })
+			res.status(500).send({ message: "Произошла непредвиденная ошибка" })
 		);
 };
 
