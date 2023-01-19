@@ -69,7 +69,7 @@ const patchUserProfile = (req, res) => {
       res.status(200).send(userResFormat(user));
     })
     .catch((err) => {
-      if (err.name === 'CastError') {
+      if (err.name === 'CastError' || err.name === 'ValidationError') {
         res.status(BAD_REQUEST).send({ message: 'Переданы некорректные данные' });
       } else if (err.message === 'NotValidId') {
         res
