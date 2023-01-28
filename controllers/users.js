@@ -24,6 +24,7 @@ const login = (req, res) => {
         .cookie('jwt', token, {
           maxAge: 3600000 * 24 * 7,
           httpOnly: true,
+          sameSite: true,
         })
         .end();
     })
@@ -34,8 +35,60 @@ const login = (req, res) => {
     });
 };
 
+const createUser = (req, res) => {
+  const {
+    name, about, avatar, email, password,
+  } = req.body;
+  bcrypt
+    .hash(password, 10)
+    .then((hash) => User.create({
+      name,
+      about,
+      avatar,
+      email,
+      password: hash,
+    }))
+    .then((user) => {
+      res.status(200).send(userResFormat(user));
+    })
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        res
+          .status(BAD_REQUEST)
+          .send({ message: 'Переданы некорректные данные' });
+      } else {
+        res
+          .status(INTERNAL_SERVER_ERROR)
+          .send({ message: 'Произошла непредвиденная ошибка' });
+      }
+    });
+};
+const getCurrentUser = (req, res) => {
+  User.findById(req.cookies.jwt)
+    .orFail(() => {
+      throw new Error('NotValidId');
+    })
+    .then((user) => {
+      res.status(200).send(userResFormat(user));
+    })
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        res
+          .status(BAD_REQUEST)
+          .send({ message: 'Переданы некорректные данные' });
+      } else if (err.message === 'NotValidId') {
+        res
+          .status(NOT_FOUND)
+          .send({ message: 'Запрашиваемый пользователь не найден' });
+      } else {
+        res
+          .status(INTERNAL_SERVER_ERROR)
+          .send({ message: 'Произошла непредвиденная ошибка' });
+      }
+    });
+};
+
 const getUsers = (req, res) => {
-  
   User.find({})
     .then((users) => users.map((user) => userResFormat(user)))
     .then((users) => res.status(200).send(users))
@@ -63,35 +116,6 @@ const getUserById = (req, res) => {
         res
           .status(NOT_FOUND)
           .send({ message: 'Запрашиваемый пользователь не найден' });
-      } else {
-        res
-          .status(INTERNAL_SERVER_ERROR)
-          .send({ message: 'Произошла непредвиденная ошибка' });
-      }
-    });
-};
-
-const createUser = (req, res) => {
-  const {
-    name, about, avatar, email, password,
-  } = req.body;
-  bcrypt
-    .hash(password, 10)
-    .then((hash) => User.create({
-      name,
-      about,
-      avatar,
-      email,
-      password: hash,
-    }))
-    .then((user) => {
-      res.status(200).send(userResFormat(user));
-    })
-    .catch((err) => {
-      if (err.name === 'ValidationError') {
-        res
-          .status(BAD_REQUEST)
-          .send({ message: 'Переданы некорректные данные' });
       } else {
         res
           .status(INTERNAL_SERVER_ERROR)
@@ -182,4 +206,5 @@ module.exports = {
   getUserById,
   patchUserProfile,
   patchUserAvatar,
+  getCurrentUser,
 };

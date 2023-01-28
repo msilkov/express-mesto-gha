@@ -3,7 +3,7 @@ const express = require('express');
 const cookieParser = require('cookie-parser');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
-const auth = require('./middlewares/auth');
+const { auth } = require('./middlewares/auth');
 
 const { NOT_FOUND } = require('./utils/utils');
 const { login, createUser } = require('./controllers/users');
@@ -19,12 +19,6 @@ mongoose.set('strictQuery', true);
 mongoose.connect('mongodb://localhost:27017/mestodb');
 
 app.use(cookieParser());
-
-app.get('/', (req, res) => {
-  // Cookies that have not been signed
-  console.log('Cookies: ', req.cookies.jwt);
-
-});
 
 app.post('/signin', login);
 app.post('/signup', createUser);
