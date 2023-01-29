@@ -64,7 +64,7 @@ const createUser = (req, res) => {
     });
 };
 const getCurrentUser = (req, res) => {
-  User.findById(req.cookies.jwt)
+  User.findById(req.user._id)
     .orFail(() => {
       throw new Error('NotValidId');
     })
@@ -100,7 +100,7 @@ const getUsers = (req, res) => {
 };
 
 const getUserById = (req, res) => {
-  User.findById(req.params._id)
+  User.findById(req.user._id)
     .orFail(() => {
       throw new Error('NotValidId');
     })
