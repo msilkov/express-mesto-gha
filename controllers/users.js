@@ -64,8 +64,7 @@ const createUser = (req, res) => {
     });
 };
 const getCurrentUser = (req, res) => {
-  const currentUserId = req.user._id;
-  User.findById(currentUserId)
+  User.findById(req.user._id)
     .orFail(() => {
       throw new Error('NotValidId');
     })
@@ -74,8 +73,6 @@ const getCurrentUser = (req, res) => {
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        console.log(currentUserId);
-
         res.status(BAD_REQUEST).send({ message: 'Переданы некорректные данные' });
       } else if (err.message === 'NotValidId') {
         res
@@ -101,7 +98,7 @@ const getUsers = (req, res) => {
 };
 
 const getUserById = (req, res) => {
-  User.findById(req.params._id)
+  User.findById(req.user._id)
     .orFail(() => {
       throw new Error('NotValidId');
     })
