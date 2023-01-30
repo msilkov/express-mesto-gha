@@ -98,7 +98,7 @@ const getUsers = (req, res) => {
 };
 
 const getUserById = (req, res) => {
-  User.findById(req.user._id)
+  User.findById(req.params._id) // если парамс то работает поиск по id если юскр  то выдает текущего
     .orFail(() => {
       throw new Error('NotValidId');
     })

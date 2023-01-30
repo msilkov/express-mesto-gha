@@ -11,7 +11,7 @@ const auth = (req, res, next) => {
   } catch (err) {
     return res
       .status(UNAUTHORIZED)
-      .send({ message: 'Необходима авторизация 2' });
+      .send({ message: 'Необходима авторизация' });
   }
   req.user = payload;
 

@@ -1,49 +1,74 @@
+const card = require('../models/card');
 const Card = require('../models/card');
 const {
-  cardResFormat, NOT_FOUND, BAD_REQUEST, INTERNAL_SERVER_ERROR,
+  cardResFormat,
+  NOT_FOUND,
+  BAD_REQUEST,
+  INTERNAL_SERVER_ERROR,
+  UNAUTHORIZED,
 } = require('../utils/utils');
 
 const getCard = (req, res) => {
   Card.find({})
-    .populate('owner')
+    .populate(['owner', 'likes'])
     .then((cards) => cards.map((card) => cardResFormat(card)))
     .then((cards) => res.status(200).send(cards))
-    .catch(() => res.status(INTERNAL_SERVER_ERROR).send({ message: 'Произошла непредвиденная ошибка' }));
+    .catch(() => res
+      .status(INTERNAL_SERVER_ERROR)
+      .send({ message: 'Произошла непредвиденная ошибка' }));
 };
 
 const createCard = (req, res) => {
   const { name, link } = req.body;
   const owner = req.user._id;
   Card.create({ name, link, owner })
-    .then((card) => {
-      res.status(200).send(cardResFormat(card));
-    })
+    .then((card) => res.status(200).send(cardResFormat(card)))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(BAD_REQUEST).send({ message: 'Переданы некорректные данные' });
+        res
+          .status(BAD_REQUEST)
+          .send({ message: 'Переданы некорректные данные' });
       } else {
-        res.status(INTERNAL_SERVER_ERROR).send({ message: 'Произошла непредвиденная ошибка' });
+        res
+          .status(INTERNAL_SERVER_ERROR)
+          .send({ message: 'Произошла непредвиденная ошибка' });
       }
     });
 };
 
 const deleteCard = (req, res) => {
-  Card.findByIdAndRemove(req.params._id)
+  Card.findById(req.params._id)
     .orFail(() => {
       throw new Error('NotValidId');
     })
     .then((card) => {
-      res.status(200).send(cardResFormat(card));
+      const currnetUser = req.user._id;
+      const cardOwner = card.owner._id.toString();
+      if (currnetUser === cardOwner) {
+        return Card.findByIdAndRemove(req.params._id).then((card) => {
+          res.status(200).send(cardResFormat(card));
+        });
+      }
+      throw new Error('NotOwner');
     })
     .catch((err) => {
+      if (err.message === 'NotOwner') {
+        res
+          .status(UNAUTHORIZED)
+          .send({ message: 'Можно удалять только свои карточки' });
+      }
       if (err.name === 'CastError') {
-        res.status(BAD_REQUEST).send({ message: 'Переданы некорректные данные' });
+        res
+          .status(BAD_REQUEST)
+          .send({ message: 'Переданы некорректные данные' });
       } else if (err.message === 'NotValidId') {
         res
           .status(NOT_FOUND)
           .send({ message: 'Карточка с данным id не найдена' });
       } else {
-        res.status(INTERNAL_SERVER_ERROR).send({ message: 'Произошла непредвиденная ошибка' });
+        res
+          .status(INTERNAL_SERVER_ERROR)
+          .send({ message: 'Произошла непредвиденная ошибка' });
       }
     });
 };
@@ -62,13 +87,17 @@ const setCardLike = (req, res) => {
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(BAD_REQUEST).send({ message: 'Переданы некорректные данные' });
+        res
+          .status(BAD_REQUEST)
+          .send({ message: 'Переданы некорректные данные' });
       } else if (err.message === 'NotValidId') {
         res
           .status(NOT_FOUND)
           .send({ message: 'Карточка с данным id не найдена' });
       } else {
-        res.status(INTERNAL_SERVER_ERROR).send({ message: 'Произошла непредвиденная ошибка' });
+        res
+          .status(INTERNAL_SERVER_ERROR)
+          .send({ message: 'Произошла непредвиденная ошибка' });
       }
     });
 };
@@ -87,13 +116,17 @@ const removeCardLike = (req, res) => {
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(BAD_REQUEST).send({ message: 'Переданы некорректные данные' });
+        res
+          .status(BAD_REQUEST)
+          .send({ message: 'Переданы некорректные данные' });
       } else if (err.message === 'NotValidId') {
         res
           .status(NOT_FOUND)
           .send({ message: 'Карточка с данным id не найдена' });
       } else {
-        res.status(INTERNAL_SERVER_ERROR).send({ message: 'Произошла непредвиденная ошибка' });
+        res
+          .status(INTERNAL_SERVER_ERROR)
+          .send({ message: 'Произошла непредвиденная ошибка' });
       }
     });
 };

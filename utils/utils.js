@@ -16,6 +16,7 @@ const cardResFormat = (card) => ({
     about: card.owner.about,
     avatar: card.owner.avatar,
     _id: card.owner._id,
+    email: card.owner.email,
   },
   createdAt: card.createdAt,
 });
