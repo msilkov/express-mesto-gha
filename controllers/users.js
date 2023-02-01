@@ -4,14 +4,14 @@ const User = require('../models/user');
 
 const { NODE_ENV, JWT_SECRET } = process.env;
 const {
-  userResFormat,
-  NOT_FOUND,
-  BAD_REQUEST,
-  INTERNAL_SERVER_ERROR,
-  UNAUTHORIZED,
+  userResFormat, STATUS_OK,
 } = require('../utils/utils');
 
-const login = (req, res) => {
+const NotFoundError = require('../errors/not-found-err');
+const BadRequestError = require('../errors/bad-req-err');
+const ConflictError = require('../errors/conflict-err');
+
+const login = (req, res, next) => {
   const { email, password } = req.body;
   return User.findUserByCredentials(email, password)
     .then((user) => {
@@ -28,14 +28,10 @@ const login = (req, res) => {
         })
         .end();
     })
-    .catch((err) => {
-      res.status(UNAUTHORIZED).send({
-        message: err.message,
-      });
-    });
+    .catch(next);
 };
 
-const createUser = (req, res) => {
+const createUser = (req, res, next) => {
   const {
     name, about, avatar, email, password,
   } = req.body;
@@ -53,17 +49,14 @@ const createUser = (req, res) => {
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res
-          .status(BAD_REQUEST)
-          .send({ message: 'Переданы некорректные данные' });
-      } else {
-        res
-          .status(INTERNAL_SERVER_ERROR)
-          .send({ message: 'Произошла непредвиденная ошибка' });
+        throw new BadRequestError('Переданы некорректные данные');
+      } else if (err.code === 11000) {
+        throw new ConflictError('Пользователь с таким email уже существует');
       }
-    });
+    })
+    .catch(next);
 };
-const getCurrentUser = (req, res) => {
+const getCurrentUser = (req, res, next) => {
   User.findById(req.user._id)
     .orFail(() => {
       throw new Error('NotValidId');
@@ -73,56 +66,40 @@ const getCurrentUser = (req, res) => {
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(BAD_REQUEST).send({ message: 'Переданы некорректные данные' });
+        throw new BadRequestError('Переданы некорректные данные');
       } else if (err.message === 'NotValidId') {
-        res
-          .status(NOT_FOUND)
-          .send({ message: 'Запрашиваемый пользователь не найден' });
-      } else {
-        res
-          .status(INTERNAL_SERVER_ERROR)
-          .send({ message: 'Произошла непредвиденная ошибка' });
+        throw new NotFoundError('Запрашиваемый пользователь не найден');
       }
-    });
+    })
+    .catch(next);
 };
 
-const getUsers = (req, res) => {
+const getUsers = (req, res, next) => {
   User.find({})
     .then((users) => users.map((user) => userResFormat(user)))
-    .then((users) => res.status(200).send(users))
-    .catch(() => {
-      res
-        .status(INTERNAL_SERVER_ERROR)
-        .send({ message: 'Произошла непредвиденная ошибка' });
-    });
+    .then((users) => res.status(STATUS_OK).send(users))
+    .catch(next);
 };
 
-const getUserById = (req, res) => {
-  User.findById(req.params._id) // если парамс то работает поиск по id если юскр  то выдает текущего
+const getUserById = (req, res, next) => {
+  User.findById(req.params._id)
     .orFail(() => {
       throw new Error('NotValidId');
     })
     .then((user) => {
-      res.status(200).send(userResFormat(user));
+      res.status(STATUS_OK).send(userResFormat(user));
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res
-          .status(BAD_REQUEST)
-          .send({ message: 'Переданы некорректные данные' });
+        throw new BadRequestError('Переданы некорректные данные');
       } else if (err.message === 'NotValidId') {
-        res
-          .status(NOT_FOUND)
-          .send({ message: 'Запрашиваемый пользователь не найден' });
-      } else {
-        res
-          .status(INTERNAL_SERVER_ERROR)
-          .send({ message: 'Произошла непредвиденная ошибка' });
+        throw new NotFoundError('Запрашиваемый пользователь не найден');
       }
-    });
+    })
+    .catch(next);
 };
 
-const patchUserProfile = (req, res) => {
+const patchUserProfile = (req, res, next) => {
   const { name, about } = req.body;
   const owner = req.user._id;
 
@@ -145,22 +122,15 @@ const patchUserProfile = (req, res) => {
     })
     .catch((err) => {
       if (err.name === 'CastError' || err.name === 'ValidationError') {
-        res
-          .status(BAD_REQUEST)
-          .send({ message: 'Переданы некорректные данные' });
+        throw new BadRequestError('Переданы некорректные данные');
       } else if (err.message === 'NotValidId') {
-        res
-          .status(NOT_FOUND)
-          .send({ message: 'Запрашиваемый пользователь не найден' });
-      } else {
-        res
-          .status(INTERNAL_SERVER_ERROR)
-          .send({ message: 'Произошла непредвиденная ошибка' });
+        throw new NotFoundError('Запрашиваемый пользователь не найден');
       }
-    });
+    })
+    .catch(next);
 };
 
-const patchUserAvatar = (req, res) => {
+const patchUserAvatar = (req, res, next) => {
   const { avatar } = req.body;
   const owner = req.user._id;
 
@@ -174,27 +144,18 @@ const patchUserAvatar = (req, res) => {
       runValidators: true,
     },
   )
-    .orFail(() => {
-      throw new Error('NotValidId');
-    })
+
     .then((user) => {
-      res.status(200).send(userResFormat(user));
+      res.status(STATUS_OK).send(userResFormat(user));
     })
     .catch((err) => {
       if (err.name === 'CastError' || err.name === 'ValidationError') {
-        res
-          .status(BAD_REQUEST)
-          .send({ message: 'Переданы некорректные данные' });
+        throw new BadRequestError('Переданы некорректные данные');
       } else if (err.message === 'NotValidId') {
-        res
-          .status(NOT_FOUND)
-          .send({ message: 'Запрашиваемый пользователь не найден' });
-      } else {
-        res
-          .status(INTERNAL_SERVER_ERROR)
-          .send({ message: 'Произошла непредвиденная ошибка' });
+        throw new NotFoundError('Запрашиваемый пользователь не найден');
       }
-    });
+    })
+    .catch(next);
 };
 
 module.exports = {

@@ -24,7 +24,9 @@ const cardResFormat = (card) => ({
 const BAD_REQUEST = 400;
 const UNAUTHORIZED = 401;
 const NOT_FOUND = 404;
+const CONFLICT = 409;
 const INTERNAL_SERVER_ERROR = 500;
+const STATUS_OK = 200;
 
 module.exports = {
   userResFormat,
@@ -33,4 +35,6 @@ module.exports = {
   NOT_FOUND,
   INTERNAL_SERVER_ERROR,
   UNAUTHORIZED,
+  CONFLICT,
+  STATUS_OK,
 };

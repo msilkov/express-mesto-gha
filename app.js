@@ -5,7 +5,7 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const { auth } = require('./middlewares/auth');
 
-const { NOT_FOUND } = require('./utils/utils');
+const { NOT_FOUND, INTERNAL_SERVER_ERROR } = require('./utils/utils');
 const { login, createUser } = require('./controllers/users');
 
 const { PORT = 3000 } = process.env;
@@ -30,6 +30,14 @@ app.use('/users', require('./routes/users'));
 
 app.use('*', (req, res) => {
   res.status(NOT_FOUND).send({ message: 'Страница не найдена.' });
+});
+
+app.use((err, req, res, next) => {
+  const { statusCode = INTERNAL_SERVER_ERROR, message } = err;
+
+  res.status(statusCode).send({
+    message: statusCode === INTERNAL_SERVER_ERROR ? 'Произошла непредвиденная ошибка' : message,
+  });
 });
 
 app.listen(PORT, () => {
