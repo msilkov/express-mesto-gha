@@ -1,5 +1,7 @@
 const mongoose = require('mongoose');
 
+const { REG_LINK } = require('../utils/utils');
+
 const cardSchema = new mongoose.Schema({
   name: {
     type: String,
@@ -10,6 +12,7 @@ const cardSchema = new mongoose.Schema({
   link: {
     type: String,
     required: true,
+    match: REG_LINK,
   },
   owner: {
     type: mongoose.Schema.Types.ObjectId,

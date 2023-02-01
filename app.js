@@ -13,8 +13,6 @@ const { login, createUser } = require('./controllers/users');
 
 const { PORT = 3000 } = process.env;
 
-const reg = /(?=^.{8,}$)((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/;
-
 const app = express();
 
 app.use(bodyParser.json());
@@ -25,16 +23,21 @@ mongoose.connect('mongodb://localhost:27017/mestodb');
 
 app.use(cookieParser());
 
-app.post('/signin', login);
+app.post('/signin', celebrate({
+  body: Joi.object().keys({
+    email: Joi.string().required().email(),
+    password: Joi.string().required().min(8),
+  }).unknown(true),
+}), login);
 app.post(
   '/signup',
-  createUser,
   celebrate({
     body: Joi.object().keys({
       email: Joi.string().required().email(),
-      password: Joi.string().pattern(reg).required().min(8),
-    }),
+      password: Joi.string().required().min(8),
+    }).unknown(true),
   }),
+  createUser,
 );
 
 app.use(auth);

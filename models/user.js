@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 const isEmail = require('validator/lib/isEmail');
 const AuthError = require('../errors/auth-err');
+const { REG_LINK } = require('../utils/utils');
 
 const userSchema = new mongoose.Schema({
   name: {
@@ -21,7 +22,7 @@ const userSchema = new mongoose.Schema({
   avatar: {
     type: String,
     minlength: 2,
-
+    match: REG_LINK,
     default: 'https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png',
   },
   email: {
