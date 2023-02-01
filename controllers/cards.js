@@ -3,7 +3,7 @@ const { cardResFormat, STATUS_OK } = require('../utils/utils');
 
 const NotFoundError = require('../errors/not-found-err');
 const BadRequestError = require('../errors/bad-req-err');
-const AuthError = require('../errors/auth-err');
+const ForbiddenError = require('../errors/forbidden-err');
 
 const getCards = (req, res, next) => {
   Card.find({})
@@ -43,7 +43,7 @@ const deleteCard = (req, res, next) => {
     })
     .catch((err) => {
       if (err.message === 'NotOwner') {
-        throw new AuthError('Можно удалять только свои карточки');
+        throw new ForbiddenError('Можно удалять только свои карточки');
       }
       if (err.name === 'CastError') {
         throw new BadRequestError('Переданы некорректные данные');

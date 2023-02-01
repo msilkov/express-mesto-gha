@@ -8,7 +8,8 @@ const {
 } = require('celebrate');
 
 const { auth } = require('./middlewares/auth');
-const { NOT_FOUND, INTERNAL_SERVER_ERROR } = require('./utils/utils');
+const { NOT_FOUND, INTERNAL_SERVER_ERROR, REG_LINK } = require('./utils/utils');
+
 const { login, createUser } = require('./controllers/users');
 
 const { PORT = 3000 } = process.env;
@@ -36,6 +37,9 @@ app.post(
       email: Joi.string().required().email(),
       password: Joi.string().required().min(8),
       name: Joi.string().min(2).max(30),
+      about: Joi.string().min(2).max(30),
+      avatar: Joi.string().pattern(REG_LINK),
+
     }).unknown(true),
   }),
   createUser,

@@ -26,7 +26,7 @@ const login = (req, res, next) => {
           httpOnly: true,
           sameSite: true,
         })
-        .end();
+        .status(STATUS_OK).send(userResFormat(user));
     })
     .catch(next);
 };
@@ -45,7 +45,7 @@ const createUser = (req, res, next) => {
       password: hash,
     }))
     .then((user) => {
-      res.status(200).send(userResFormat(user));
+      res.status(STATUS_OK).send(userResFormat(user));
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
@@ -62,7 +62,7 @@ const getCurrentUser = (req, res, next) => {
       throw new Error('NotValidId');
     })
     .then((user) => {
-      res.status(200).send(userResFormat(user));
+      res.status(STATUS_OK).send(userResFormat(user));
     })
     .catch((err) => {
       if (err.name === 'CastError') {
@@ -118,7 +118,7 @@ const patchUserProfile = (req, res, next) => {
       throw new Error('NotValidId');
     })
     .then((user) => {
-      res.status(200).send(userResFormat(user));
+      res.status(STATUS_OK).send(userResFormat(user));
     })
     .catch((err) => {
       if (err.name === 'CastError' || err.name === 'ValidationError') {
