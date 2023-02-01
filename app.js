@@ -1,14 +1,19 @@
 require('dotenv').config();
 const express = require('express');
 const cookieParser = require('cookie-parser');
-const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
-const { auth } = require('./middlewares/auth');
+const mongoose = require('mongoose');
+const {
+  celebrate, Joi, errors,
+} = require('celebrate');
 
+const { auth } = require('./middlewares/auth');
 const { NOT_FOUND, INTERNAL_SERVER_ERROR } = require('./utils/utils');
 const { login, createUser } = require('./controllers/users');
 
 const { PORT = 3000 } = process.env;
+
+const reg = /(?=^.{8,}$)((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/;
 
 const app = express();
 
@@ -21,7 +26,16 @@ mongoose.connect('mongodb://localhost:27017/mestodb');
 app.use(cookieParser());
 
 app.post('/signin', login);
-app.post('/signup', createUser);
+app.post(
+  '/signup',
+  createUser,
+  celebrate({
+    body: Joi.object().keys({
+      email: Joi.string().required().email(),
+      password: Joi.string().pattern(reg).required().min(8),
+    }),
+  }),
+);
 
 app.use(auth);
 
@@ -32,12 +46,18 @@ app.use('*', (req, res) => {
   res.status(NOT_FOUND).send({ message: 'Страница не найдена.' });
 });
 
+app.use(errors());
+
 app.use((err, req, res, next) => {
   const { statusCode = INTERNAL_SERVER_ERROR, message } = err;
 
   res.status(statusCode).send({
-    message: statusCode === INTERNAL_SERVER_ERROR ? 'Произошла непредвиденная ошибка' : message,
+    message:
+      statusCode === INTERNAL_SERVER_ERROR
+        ? 'Произошла непредвиденная ошибка'
+        : message,
   });
+  next();
 });
 
 app.listen(PORT, () => {

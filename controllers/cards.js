@@ -1,12 +1,5 @@
-const card = require('../models/card');
 const Card = require('../models/card');
-const {
-  cardResFormat,
-  NOT_FOUND,
-  BAD_REQUEST,
-  INTERNAL_SERVER_ERROR,
-  UNAUTHORIZED, STATUS_OK,
-} = require('../utils/utils');
+const { cardResFormat, STATUS_OK } = require('../utils/utils');
 
 const NotFoundError = require('../errors/not-found-err');
 const BadRequestError = require('../errors/bad-req-err');
@@ -29,7 +22,8 @@ const createCard = (req, res, next) => {
       if (err.name === 'ValidationError') {
         throw new BadRequestError('Переданы некорректные данные');
       }
-    }).catch(next);
+    })
+    .catch(next);
 };
 
 const deleteCard = (req, res, next) => {
@@ -41,9 +35,9 @@ const deleteCard = (req, res, next) => {
       const currnetUser = req.user._id;
       const cardOwner = card.owner._id.toString();
       if (currnetUser === cardOwner) {
-        return Card.findByIdAndRemove(req.params._id).then((card) => {
-          res.status(STATUS_OK).send(cardResFormat(card));
-        });
+        return Card.findByIdAndRemove(req.params._id).then(
+          res.status(STATUS_OK).send(cardResFormat(card)),
+        );
       }
       throw new Error('NotOwner');
     })
