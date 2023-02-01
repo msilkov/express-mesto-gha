@@ -6,20 +6,31 @@ const userResFormat = (user) => ({
   email: user.email,
 });
 
-const cardResFormat = (card) => ({
-  likes: card.likes,
-  _id: card._id,
-  name: card.name,
-  link: card.link,
-  owner: {
-    name: card.owner.name,
-    about: card.owner.about,
-    avatar: card.owner.avatar,
-    _id: card.owner._id,
-    email: card.owner.email,
-  },
-  createdAt: card.createdAt,
-});
+const cardResFormat = (card) => (card.owner === null
+  ? {
+    likes: card.likes,
+    _id: card._id,
+    name: card.name,
+    link: card.link,
+    owner: {
+      name: 'deleted',
+    },
+    createdAt: card.createdAt,
+  }
+  : {
+    likes: card.likes,
+    _id: card._id,
+    name: card.name,
+    link: card.link,
+    owner: {
+      name: card.owner.name,
+      about: card.owner.about,
+      avatar: card.owner.avatar,
+      _id: card.owner._id,
+      email: card.owner.email,
+    },
+    createdAt: card.createdAt,
+  });
 
 const BAD_REQUEST = 400;
 const UNAUTHORIZED = 401;

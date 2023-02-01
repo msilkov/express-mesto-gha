@@ -5,38 +5,34 @@ const {
   NOT_FOUND,
   BAD_REQUEST,
   INTERNAL_SERVER_ERROR,
-  UNAUTHORIZED,
+  UNAUTHORIZED, STATUS_OK,
 } = require('../utils/utils');
 
-const getCard = (req, res) => {
+const NotFoundError = require('../errors/not-found-err');
+const BadRequestError = require('../errors/bad-req-err');
+const AuthError = require('../errors/auth-err');
+
+const getCards = (req, res, next) => {
   Card.find({})
     .populate(['owner', 'likes'])
     .then((cards) => cards.map((card) => cardResFormat(card)))
-    .then((cards) => res.status(200).send(cards))
-    .catch(() => res
-      .status(INTERNAL_SERVER_ERROR)
-      .send({ message: 'Произошла непредвиденная ошибка' }));
+    .then((cards) => res.status(STATUS_OK).send(cards))
+    .catch(next);
 };
 
-const createCard = (req, res) => {
+const createCard = (req, res, next) => {
   const { name, link } = req.body;
   const owner = req.user._id;
   Card.create({ name, link, owner })
-    .then((card) => res.status(200).send(cardResFormat(card)))
+    .then((card) => res.status(STATUS_OK).send(cardResFormat(card)))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res
-          .status(BAD_REQUEST)
-          .send({ message: 'Переданы некорректные данные' });
-      } else {
-        res
-          .status(INTERNAL_SERVER_ERROR)
-          .send({ message: 'Произошла непредвиденная ошибка' });
+        throw new BadRequestError('Переданы некорректные данные');
       }
-    });
+    }).catch(next);
 };
 
-const deleteCard = (req, res) => {
+const deleteCard = (req, res, next) => {
   Card.findById(req.params._id)
     .orFail(() => {
       throw new Error('NotValidId');
@@ -46,34 +42,25 @@ const deleteCard = (req, res) => {
       const cardOwner = card.owner._id.toString();
       if (currnetUser === cardOwner) {
         return Card.findByIdAndRemove(req.params._id).then((card) => {
-          res.status(200).send(cardResFormat(card));
+          res.status(STATUS_OK).send(cardResFormat(card));
         });
       }
       throw new Error('NotOwner');
     })
     .catch((err) => {
       if (err.message === 'NotOwner') {
-        res
-          .status(UNAUTHORIZED)
-          .send({ message: 'Можно удалять только свои карточки' });
+        throw new AuthError('Можно удалять только свои карточки');
       }
       if (err.name === 'CastError') {
-        res
-          .status(BAD_REQUEST)
-          .send({ message: 'Переданы некорректные данные' });
+        throw new BadRequestError('Переданы некорректные данные');
       } else if (err.message === 'NotValidId') {
-        res
-          .status(NOT_FOUND)
-          .send({ message: 'Карточка с данным id не найдена' });
-      } else {
-        res
-          .status(INTERNAL_SERVER_ERROR)
-          .send({ message: 'Произошла непредвиденная ошибка' });
+        throw new NotFoundError('Карточка с данным id не найдена');
       }
-    });
+    })
+    .catch(next);
 };
 
-const setCardLike = (req, res) => {
+const setCardLike = (req, res, next) => {
   Card.findByIdAndUpdate(
     req.params._id,
     { $addToSet: { likes: req.user._id } },
@@ -83,26 +70,19 @@ const setCardLike = (req, res) => {
       throw new Error('NotValidId');
     })
     .then((card) => {
-      res.status(200).send(cardResFormat(card));
+      res.status(STATUS_OK).send(cardResFormat(card));
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res
-          .status(BAD_REQUEST)
-          .send({ message: 'Переданы некорректные данные' });
+        throw new BadRequestError('Переданы некорректные данные');
       } else if (err.message === 'NotValidId') {
-        res
-          .status(NOT_FOUND)
-          .send({ message: 'Карточка с данным id не найдена' });
-      } else {
-        res
-          .status(INTERNAL_SERVER_ERROR)
-          .send({ message: 'Произошла непредвиденная ошибка' });
+        throw new NotFoundError('Карточка с данным id не найдена');
       }
-    });
+    })
+    .catch(next);
 };
 
-const removeCardLike = (req, res) => {
+const removeCardLike = (req, res, next) => {
   Card.findByIdAndUpdate(
     req.params._id,
     { $pull: { likes: req.user._id } },
@@ -112,27 +92,20 @@ const removeCardLike = (req, res) => {
       throw new Error('NotValidId');
     })
     .then((card) => {
-      res.status(200).send(cardResFormat(card));
+      res.status(STATUS_OK).send(cardResFormat(card));
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res
-          .status(BAD_REQUEST)
-          .send({ message: 'Переданы некорректные данные' });
+        throw new BadRequestError('Переданы некорректные данные');
       } else if (err.message === 'NotValidId') {
-        res
-          .status(NOT_FOUND)
-          .send({ message: 'Карточка с данным id не найдена' });
-      } else {
-        res
-          .status(INTERNAL_SERVER_ERROR)
-          .send({ message: 'Произошла непредвиденная ошибка' });
+        throw new NotFoundError('Карточка с данным id не найдена');
       }
-    });
+    })
+    .catch(next);
 };
 
 module.exports = {
-  getCard,
+  getCards,
   createCard,
   deleteCard,
   setCardLike,
