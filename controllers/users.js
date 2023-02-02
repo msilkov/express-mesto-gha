@@ -28,7 +28,9 @@ const login = (req, res, next) => {
         })
         .status(STATUS_OK).send(userResFormat(user));
     })
-    .catch(next);
+    .catch((err) => {
+      next(err);
+    });
 };
 
 const createUser = (req, res, next) => {
@@ -49,54 +51,53 @@ const createUser = (req, res, next) => {
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        throw new BadRequestError('Переданы некорректные данные');
-      } else if (err.code === 11000) {
-        throw new ConflictError('Пользователь с таким email уже существует');
+        next(new BadRequestError());
+        return;
+      } if (err.code === 11000) {
+        next(new ConflictError('email'));
+        return;
       }
-    })
-    .catch(next);
+      next(err);
+    });
 };
+
 const getCurrentUser = (req, res, next) => {
   User.findById(req.user._id)
-    .orFail(() => {
-      throw new Error('NotValidId');
-    })
+    .orFail(new NotFoundError('user'))
     .then((user) => {
       res.status(STATUS_OK).send(userResFormat(user));
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        throw new BadRequestError('Переданы некорректные данные');
-      } else if (err.message === 'NotValidId') {
-        throw new NotFoundError('Запрашиваемый пользователь не найден');
+        next(new BadRequestError());
+        return;
       }
-    })
-    .catch(next);
+      next(err);
+    });
 };
 
 const getUsers = (req, res, next) => {
   User.find({})
     .then((users) => users.map((user) => userResFormat(user)))
     .then((users) => res.status(STATUS_OK).send(users))
-    .catch(next);
+    .catch((err) => {
+      next(err);
+    });
 };
 
 const getUserById = (req, res, next) => {
   User.findById(req.params._id)
-    .orFail(() => {
-      throw new Error('NotValidId');
-    })
+    .orFail(new NotFoundError('user'))
     .then((user) => {
       res.status(STATUS_OK).send(userResFormat(user));
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        throw new BadRequestError('Переданы некорректные данные');
-      } else if (err.message === 'NotValidId') {
-        throw new NotFoundError('Запрашиваемый пользователь не найден');
+        next(new BadRequestError());
+        return;
       }
-    })
-    .catch(next);
+      next(err);
+    });
 };
 
 const patchUserProfile = (req, res, next) => {
@@ -114,20 +115,17 @@ const patchUserProfile = (req, res, next) => {
       runValidators: true,
     },
   )
-    .orFail(() => {
-      throw new Error('NotValidId');
-    })
+    .orFail(new NotFoundError('user'))
     .then((user) => {
       res.status(STATUS_OK).send(userResFormat(user));
     })
     .catch((err) => {
       if (err.name === 'CastError' || err.name === 'ValidationError') {
-        throw new BadRequestError('Переданы некорректные данные');
-      } else if (err.message === 'NotValidId') {
-        throw new NotFoundError('Запрашиваемый пользователь не найден');
+        next(new BadRequestError());
+        return;
       }
-    })
-    .catch(next);
+      next(err);
+    });
 };
 
 const patchUserAvatar = (req, res, next) => {
@@ -144,18 +142,17 @@ const patchUserAvatar = (req, res, next) => {
       runValidators: true,
     },
   )
-
+    .orFail(new NotFoundError('user'))
     .then((user) => {
       res.status(STATUS_OK).send(userResFormat(user));
     })
     .catch((err) => {
       if (err.name === 'CastError' || err.name === 'ValidationError') {
-        throw new BadRequestError('Переданы некорректные данные');
-      } else if (err.message === 'NotValidId') {
-        throw new NotFoundError('Запрашиваемый пользователь не найден');
+        next(new BadRequestError());
+        return;
       }
-    })
-    .catch(next);
+      next(err);
+    });
 };
 
 module.exports = {

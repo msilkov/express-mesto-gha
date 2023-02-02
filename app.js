@@ -3,14 +3,20 @@ const express = require('express');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
-const {
-  celebrate, Joi, errors,
-} = require('celebrate');
+const { errors } = require('celebrate');
+
+const cardsRouter = require('./routes/cards');
+const usersRouter = require('./routes/users');
 
 const { auth } = require('./middlewares/auth');
-const { NOT_FOUND, INTERNAL_SERVER_ERROR, REG_LINK } = require('./utils/utils');
 
 const { login, createUser } = require('./controllers/users');
+const {
+  signInValidation,
+  signUpValidation,
+} = require('./middlewares/requetsValidation');
+const { errorsHandler } = require('./middlewares/errorsHandler');
+const { incorrectRouteHandler } = require('./middlewares/incorrectRouteHandler');
 
 const { PORT = 3000 } = process.env;
 
@@ -24,49 +30,19 @@ mongoose.connect('mongodb://localhost:27017/mestodb');
 
 app.use(cookieParser());
 
-app.post('/signin', celebrate({
-  body: Joi.object().keys({
-    email: Joi.string().required().email(),
-    password: Joi.string().required().min(8),
-  }).unknown(true),
-}), login);
-app.post(
-  '/signup',
-  celebrate({
-    body: Joi.object().keys({
-      email: Joi.string().required().email(),
-      password: Joi.string().required().min(8),
-      name: Joi.string().min(2).max(30),
-      about: Joi.string().min(2).max(30),
-      avatar: Joi.string().pattern(REG_LINK),
-
-    }).unknown(true),
-  }),
-  createUser,
-);
+app.post('/signin', signInValidation, login);
+app.post('/signup', signUpValidation, createUser);
 
 app.use(auth);
 
-app.use('/cards', require('./routes/cards'));
-app.use('/users', require('./routes/users'));
+app.use('/cards', cardsRouter);
+app.use('/users', usersRouter);
 
-app.use('*', (req, res) => {
-  res.status(NOT_FOUND).send({ message: 'Страница не найдена.' });
-});
+app.use('*', incorrectRouteHandler);
 
 app.use(errors());
 
-app.use((err, req, res, next) => {
-  const { statusCode = INTERNAL_SERVER_ERROR, message } = err;
-
-  res.status(statusCode).send({
-    message:
-      statusCode === INTERNAL_SERVER_ERROR
-        ? 'Произошла непредвиденная ошибка'
-        : message,
-  });
-  next();
-});
+app.use(errorsHandler);
 
 app.listen(PORT, () => {
   console.log(`App listening on port ${PORT}`);
