@@ -1,10 +1,10 @@
 const { NOT_FOUND } = require('../utils/utils');
 
 class NotFoundError extends Error {
-  constructor(marker, message) {
+  constructor(marker, message = 'Передан некорректный идентификатор') {
     super(message);
     this.statusCode = NOT_FOUND;
-    this.message = 'Передан некорректный идентификатор';
+    this.message = message;
     this.marker = this.messageHandler(marker);
   }
 

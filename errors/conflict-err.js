@@ -1,10 +1,10 @@
 const { CONFLICT } = require('../utils/utils');
 
 class ConflictError extends Error {
-  constructor(marker, message) {
+  constructor(marker, message = 'Конфликтное обращение к ресурсу') {
     super(message);
     this.statusCode = CONFLICT;
-    this.message = 'Конфликтное обращение к ресурсу';
+    this.message = message;
     this.marker = this.messageHandler(marker);
   }
 

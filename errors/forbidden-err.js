@@ -1,10 +1,10 @@
 const { FORBIDDEN } = require('../utils/utils');
 
 class ForbiddenError extends Error {
-  constructor(marker, message) {
+  constructor(marker, message = 'У пользователя не хватает прав доступа к запрашиваемому ресурсу') {
     super(message);
     this.statusCode = FORBIDDEN;
-    this.message = 'У пользователя не хватает прав доступа к запрашиваемому ресурсу';
+    this.message = message;
     this.marker = this.messageHandler(marker);
   }
 
