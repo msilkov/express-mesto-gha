@@ -5,6 +5,7 @@ const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const express = require('express');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
+const { cors } = require('./middlewares/cors');
 
 const cardsRouter = require('./routes/cards');
 const usersRouter = require('./routes/users');
@@ -48,6 +49,8 @@ app.use('/cards', cardsRouter);
 app.use('/users', usersRouter);
 
 app.use('*', incorrectRouteHandler);
+
+app.use(cors());
 
 app.use(errorLogger);
 
