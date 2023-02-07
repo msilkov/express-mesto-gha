@@ -20,8 +20,6 @@ const {
 const { errorsHandler } = require('./middlewares/errorsHandler');
 const { incorrectRouteHandler } = require('./middlewares/incorrectRouteHandler');
 
-const { PORT = 3000 } = process.env;
-
 const app = express();
 
 app.use(bodyParser.json());
@@ -50,13 +48,11 @@ app.use('/users', usersRouter);
 
 app.use('*', incorrectRouteHandler);
 
-app.use(cors());
+app.use(cors);
 
 app.use(errorLogger);
 
 app.use(errors()); // celebrate error handler
 app.use(errorsHandler); // centralized error handler
 
-app.listen(PORT, () => {
-  console.log(`App listening on port ${PORT}`);
-});
+module.exports = app;
