@@ -1,9 +1,10 @@
 require('dotenv').config();
-const express = require('express');
-const cookieParser = require('cookie-parser');
-const bodyParser = require('body-parser');
-const mongoose = require('mongoose');
 const { errors } = require('celebrate');
+const mongoose = require('mongoose');
+const bodyParser = require('body-parser');
+const cookieParser = require('cookie-parser');
+const express = require('express');
+const { requestLogger, errorLogger } = require('./middlewares/logger');
 
 const cardsRouter = require('./routes/cards');
 const usersRouter = require('./routes/users');
@@ -30,6 +31,8 @@ mongoose.connect('mongodb://localhost:27017/mestodb');
 
 app.use(cookieParser());
 
+app.use(requestLogger);
+
 app.post('/signin', signInValidation, login);
 app.post('/signup', signUpValidation, createUser);
 
@@ -40,9 +43,10 @@ app.use('/users', usersRouter);
 
 app.use('*', incorrectRouteHandler);
 
-app.use(errors());
+app.use(errorLogger);
 
-app.use(errorsHandler);
+app.use(errors()); // celebrate error handler
+app.use(errorsHandler); // centralized error handler
 
 app.listen(PORT, () => {
   console.log(`App listening on port ${PORT}`);
