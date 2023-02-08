@@ -43,8 +43,8 @@ const STATUS_OK = 200;
 const REG_LINK = /^https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_+.~#?&/=]*)$/;
 
 const allowedCors = [
-  'https://msilkov.mesto.nomoredomainsclub.ru',
-  'http://msilkov.mesto.nomoredomainsclub.ru',
+  'https://api.msilkov.mesto.nomoredomainsclub.ru',
+  'http://api.msilkov.mesto.nomoredomainsclub.ru',
   'localhost:3000',
 ];
 
