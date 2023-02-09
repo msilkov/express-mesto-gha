@@ -1,6 +1,6 @@
 const app = require('./app');
 const { cors } = require('./middlewares/cors');
-const { allowedCors } = require('./utils/utils.js');
+const { allowedCors } = require('./utils/allowedCors');
 
 const { PORT = 3000 } = process.env;
 

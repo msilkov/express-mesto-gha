@@ -42,14 +42,6 @@ const STATUS_OK = 200;
 
 const REG_LINK = /^https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_+.~#?&/=]*)$/;
 
-const allowedCors = [
-  'https://api.msilkov.mesto.nomoredomainsclub.ru',
-  'http://api.msilkov.mesto.nomoredomainsclub.ru',
-  'https://msilkov.mesto.nomoredomainsclub.ru',
-  'http://msilkov.mesto.nomoredomainsclub.ru',
-  'http://localhost:3000',
-];
-
 module.exports = {
   userResFormat,
   cardResFormat,
@@ -61,5 +53,5 @@ module.exports = {
   STATUS_OK,
   REG_LINK,
   FORBIDDEN,
-  allowedCors,
+
 };
