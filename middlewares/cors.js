@@ -1,6 +1,6 @@
 const { allowedCors } = require('../utils/utils');
 
-const cors = (req, res, next) => {
+const cors = function (req, res, next) {
   const { origin } = req.headers;
   const { method } = req;
   const requestHeaders = req.headers['access-control-request-headers'];
@@ -15,7 +15,7 @@ const cors = (req, res, next) => {
     res.header('Access-Control-Allow-Methods', DEFAULT_ALLOWED_METHODS);
     res.end();
   }
-  return next();
+  next();
 };
 
 module.exports = {
