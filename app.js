@@ -32,6 +32,8 @@ app.use(cookieParser());
 
 app.use(requestLogger);
 
+app.use(cors);
+
 app.get('/crash-test', () => {
   setTimeout(() => {
     throw new Error('Сервер сейчас упадёт');
@@ -47,8 +49,6 @@ app.use('/cards', cardsRouter);
 app.use('/users', usersRouter);
 
 app.use('*', incorrectRouteHandler);
-
-app.use(cors);
 
 app.use(errorLogger);
 
