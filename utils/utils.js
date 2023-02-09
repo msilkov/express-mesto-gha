@@ -45,7 +45,7 @@ const REG_LINK = /^https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9
 const allowedCors = [
   'https://api.msilkov.mesto.nomoredomainsclub.ru',
   'http://api.msilkov.mesto.nomoredomainsclub.ru',
-  'localhost:3000',
+  'http://localhost:3000',
 ];
 
 module.exports = {
