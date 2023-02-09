@@ -10,6 +10,7 @@ const cardsRouter = require('./routes/cards');
 const usersRouter = require('./routes/users');
 
 const { auth } = require('./middlewares/auth');
+const { corsHandler } = require('./middlewares/cors');
 
 const { login, createUser } = require('./controllers/users');
 const {
@@ -36,6 +37,8 @@ app.get('/crash-test', () => {
     throw new Error('Сервер сейчас упадёт');
   }, 0);
 });
+
+app.use(corsHandler);
 
 app.post('/signin', signInValidation, login);
 app.post('/signup', signUpValidation, createUser);
