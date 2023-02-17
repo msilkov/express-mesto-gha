@@ -33,6 +33,14 @@ const login = (req, res, next) => {
     .catch(next);
 };
 
+const logout = (req, res, next) => {
+  try {
+    res.clearCookie('jwt').status(STATUS_OK).send({ message: 'logout complete' });
+  } catch (err) {
+    next(err);
+  }
+};
+
 const createUser = (req, res, next) => {
   const {
     name, about, avatar, email, password,
@@ -150,6 +158,7 @@ const patchUserAvatar = (req, res, next) => {
 
 module.exports = {
   login,
+  logout,
   createUser,
   getUsers,
   getUserById,

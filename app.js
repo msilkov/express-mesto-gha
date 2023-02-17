@@ -18,7 +18,7 @@ const {
 const { errorsHandler } = require('./middlewares/errorsHandler');
 const { incorrectRouteHandler } = require('./middlewares/incorrectRouteHandler');
 
-const { login, createUser } = require('./controllers/users');
+const { login, createUser, logout } = require('./controllers/users');
 
 const app = express();
 
@@ -42,6 +42,7 @@ app.use(corsHandler);
 
 app.post('/signin', signInValidation, login);
 app.post('/signup', signUpValidation, createUser);
+app.get('/logout', logout);
 
 app.use(auth);
 
