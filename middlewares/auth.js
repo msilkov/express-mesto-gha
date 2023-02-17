@@ -19,7 +19,7 @@ const auth = (req, res, next) => {
   return next();
 };
 
-const YOUR_JWT = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2M2U2OTRlODZjNjFkYWI3YTMzYmZiZGUiLCJpYXQiOjE2NzY2NTQyMjcsImV4cCI6MTY3NzI1OTAyN30.omEvCu8yNfAg-q8ObdhwIkgWjaGrbtPSJrIQqEfa7Y8'; // вставьте сюда JWT, который вернул публичный сервер
+const YOUR_JWT = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2M2U2OTRlODZjNjFkYWI3YTMzYmZiZGUiLCJpYXQiOjE2NzY2NTQ5MTksImV4cCI6MTY3NzI1OTcxOX0.R6M7X23aDjJUxrfrsm7osWVxcVDiflv7_LCVnMQbOm4'; // вставьте сюда JWT, который вернул публичный сервер
 const SECRET_KEY_DEV = '222f7ea40eed03f3363eb8d1d7728dd674331a19bdc01759ff157127458001a6'; // вставьте сюда секретный ключ для разработки из кода
 try {
   const payloadCh = jwt.verify(YOUR_JWT, SECRET_KEY_DEV);
