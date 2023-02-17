@@ -6,5 +6,3 @@ module.exports = {
 
 // logout route
 // refactor
-// google fix
-// connect mogo compas for serv
