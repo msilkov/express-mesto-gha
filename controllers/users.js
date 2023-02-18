@@ -35,7 +35,7 @@ const login = (req, res, next) => {
 
 const logout = (req, res, next) => {
   try {
-    res.clearCookie('jwt').status(STATUS_OK).send({ message: 'logout complete' });
+    res.clearCookie('jwt').send({ message: 'logout complete' });
   } catch (err) {
     next(err);
   }
