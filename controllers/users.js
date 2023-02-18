@@ -35,7 +35,12 @@ const login = (req, res, next) => {
 
 const logout = (req, res, next) => {
   try {
-    res.clearCookie('jwt').send({ message: 'logout complete' });
+    res.clearCookie('jwt', {
+      httpOnly: true,
+      sameSite: 'none',
+      secure: true,
+      domain: 'msilkov.mesto.nomoredomainsclub.ru',
+    }).send({ message: 'logout complete' });
   } catch (err) {
     next(err);
   }
