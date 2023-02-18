@@ -2,7 +2,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 
-const { NODE_ENV, JWT_SECRET } = require('../config');
+const { JWT_SECRET } = require('../config');
 const { userResFormat } = require('../utils/utils');
 const { STATUS_OK } = require('../utils/constants');
 
@@ -14,11 +14,9 @@ const login = (req, res, next) => {
   const { email, password } = req.body;
   return User.findUserByCredentials(email, password)
     .then((user) => {
-      const token = jwt.sign(
-        { _id: user._id },
-        NODE_ENV === 'production node server.js' ? JWT_SECRET : 'dev-some-secret-key',
-        { expiresIn: '7d' },
-      );
+      const token = jwt.sign({ _id: user._id }, JWT_SECRET, {
+        expiresIn: '7d',
+      });
       res
         .cookie('jwt', token, {
           maxAge: 3600000 * 24 * 7,
@@ -35,12 +33,7 @@ const login = (req, res, next) => {
 
 const logout = (req, res, next) => {
   try {
-    res.clearCookie('jwt', {
-      httpOnly: true,
-      sameSite: 'none',
-      secure: true,
-      domain: 'msilkov.mesto.nomoredomainsclub.ru',
-    }).send({ message: 'logout complete' });
+    res.clearCookie('jwt').send({ message: 'logout complete' });
   } catch (err) {
     next(err);
   }
