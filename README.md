@@ -1,5 +1,5 @@
 [![Tests](../../actions/workflows/tests-13-sprint.yml/badge.svg)](../../actions/workflows/tests-13-sprint.yml) [![Tests](../../actions/workflows/tests-14-sprint.yml/badge.svg)](../../actions/workflows/tests-14-sprint.yml)
-# Проект Mesto фронтенд + бэкенд
+# Проект Mesto бэкенд
 
 ## Описание проекта: 
 Cоздание сервера для проекта Mesto. В проекте был создан и настроен сервер, настроено взаимодействие с базой данных, реализована авторизация пользователей.
